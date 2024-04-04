@@ -1,5 +1,10 @@
 ﻿@page "/weather"
+@using DevelopmentProjectErrorBoardUI.Services
+@using DevelopmentProjectErrorBoardUI.Models
+@using Newtonsoft.Json;
+@using System.Net
 @inject HttpClient Http
+@inject IErrorService ErrorService
 
 <PageTitle>Weather</PageTitle>
 
@@ -7,12 +12,16 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (tests == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
+    <h1>
+        @errors.Count
+    </h1>
+    
     <table class="table">
         <thead>
             <tr>
@@ -20,38 +29,78 @@ else
                 <th>Temp. (C)</th>
                 <th>Temp. (F)</th>
                 <th>Summary</th>
+                <th>...</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+        @foreach(var error in errors)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@error.Error.InitialFile</td>
+                    <td>@error.Error.LineNumber</td>
+                    <td>@error.Error.AgentId</td>
+                    <td>@error.Error.DeveloperId</td>
+                    <td> @*<input type="button" onclick="{@updateError(error.Error.ErrorId);}"/>*@ 
+                        <button @onclick="() => updateError(error.Error.ErrorId)">Click me!</button>
+</td>
                 </tr>
+                @foreach (var path in error.LogPaths)
+                {
+                    <tr>
+                        <td></td> 
+                        <td>@path.FileName</td> 
+                        <td>@path.CreatedDate</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<Test>? tests;
+   List<ErrorAndPathModel> errors;
+   //string apitest;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        var httpRequestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri =new Uri($"{Http.BaseAddress.ToString()}GetErrors/GetAllErrors"/*"https://api.thecatapi.com/v1/images/0XYvRd7oD"*/),
+            Headers = { 
+                //   { HttpRequestHeader.Authorization.ToString(), "Bearer xxxxxxxxxxxxxxxxxxx" },
+               // { HttpRequestHeader.Accept.ToString(), "application/json" },
+                //   { "X-Version", "1" }
+            },
+            // Content = new StringContent(JsonConvert.SerializeObject(svm))
+        };
+
+        var resultContent = await Http.SendAsync(httpRequestMessage);
+       // apitest = resultContent.Content.ReadAsStringAsync().Result;
+
+       errors = JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(resultContent.Content.ReadAsStringAsync().Result);
+
+        //apitest = ErrorService.GetAsync("https://api.thecatapi.com/v1/images/0XYvRd7oD").Result.ToList();
+        
+        tests = new List<Test>();
+        tests.Add(new Test()
+        {
+            TST = 45,
+            TST2 = "BIG TESTA"
+        });
     }
 
-    public class WeatherForecast
+    void updateError(int errorId )
     {
-        public DateOnly Date { get; set; }
+        Console.WriteLine($"Error Id {errorId} has been updated");
+      //  return true;
+    }
 
-        public int TemperatureC { get; set; }
+    public class Test
+    {
+        public int TST { get; set; }
 
-        public string? Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public string TST2 { get; set; }
     }
 }
