@@ -1,4 +1,4 @@
-﻿@page "/weather"
+﻿@page "/errorBoard"
 @using DevelopmentProjectErrorBoardUI.Services
 @using DevelopmentProjectErrorBoardUI.Models
 @using Newtonsoft.Json;
@@ -12,7 +12,7 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (tests == null)
+@if (errors == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -40,9 +40,14 @@ else
                     <td>@error.Error.LineNumber</td>
                     <td>@error.Error.AgentId</td>
                     <td>@error.Error.DeveloperId</td>
-                    <td> @*<input type="button" onclick="{@updateError(error.Error.ErrorId);}"/>*@ 
-                        <button @onclick="() => updateError(error.Error.ErrorId)">Click me!</button>
-</td>
+                    <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
+                    <td> <select class="select-element" @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
+                             @foreach (var st in status)
+                             {
+                                 <option value="@st">@st</option> 
+                             }
+                    </select> 
+                    </td>
                 </tr>
                 @foreach (var path in error.LogPaths)
                 {
@@ -58,22 +63,16 @@ else
 }
 
 @code {
-    private List<Test>? tests;
    List<ErrorAndPathModel> errors;
    //string apitest;
 
+   List<string> status;
     protected override async Task OnInitializedAsync()
     {
         var httpRequestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri =new Uri($"{Http.BaseAddress.ToString()}GetErrors/GetAllErrors"/*"https://api.thecatapi.com/v1/images/0XYvRd7oD"*/),
-            Headers = { 
-                //   { HttpRequestHeader.Authorization.ToString(), "Bearer xxxxxxxxxxxxxxxxxxx" },
-               // { HttpRequestHeader.Accept.ToString(), "application/json" },
-                //   { "X-Version", "1" }
-            },
-            // Content = new StringContent(JsonConvert.SerializeObject(svm))
+            RequestUri =new Uri($"{Http.BaseAddress.ToString()}GetErrors/GetAllErrors")
         };
 
         var resultContent = await Http.SendAsync(httpRequestMessage);
@@ -81,26 +80,18 @@ else
 
        errors = JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(resultContent.Content.ReadAsStringAsync().Result);
 
-        //apitest = ErrorService.GetAsync("https://api.thecatapi.com/v1/images/0XYvRd7oD").Result.ToList();
-        
-        tests = new List<Test>();
-        tests.Add(new Test()
-        {
-            TST = 45,
-            TST2 = "BIG TESTA"
-        });
+       status = new List<string>() { "ONE", "TWO", "THREE" };
     }
 
-    void updateError(int errorId )
+    void removeError(int errorId )
     {
-        Console.WriteLine($"Error Id {errorId} has been updated");
+        Console.WriteLine($"Error Id {errorId} has been removed");
       //  return true;
     }
-
-    public class Test
+    
+    void updateError(int errorId, string testStatus )
     {
-        public int TST { get; set; }
-
-        public string TST2 { get; set; }
+        Console.WriteLine($"Error Id {errorId} has been updated with new status {testStatus}");
+        //  return true;
     }
 }
