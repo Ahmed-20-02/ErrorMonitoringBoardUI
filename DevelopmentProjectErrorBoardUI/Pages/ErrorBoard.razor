@@ -3,12 +3,13 @@
 @using DevelopmentProjectErrorBoardUI.Models
 @using Newtonsoft.Json;
 @using System.Net
+@using DevelopmentProjectErrorBoardUI.Enums
 @inject HttpClient Http
 @inject IErrorService ErrorService
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Error Monitor</PageTitle>
 
-<h1>Weather</h1>
+<h1>Errors</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
@@ -41,8 +42,9 @@ else
                     <td>@error.Error.AgentId</td>
                     <td>@error.Error.DeveloperId</td>
                     <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
-                    <td> <select class="select-element" @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
-                             @foreach (var st in status)
+                    
+                    <td> <select value="@((StatusEnum)error.Error.StatusId)" class="select-element" @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
+                             @foreach (var st in statuses)
                              {
                                  <option value="@st">@st</option> 
                              }
@@ -63,6 +65,8 @@ else
 }
 
 @code {
+    
+    List<StatusEnum> statuses = Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().ToList();
    List<ErrorAndPathModel> errors;
    //string apitest;
 
@@ -80,7 +84,7 @@ else
 
        errors = JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(resultContent.Content.ReadAsStringAsync().Result);
 
-       status = new List<string>() { "ONE", "TWO", "THREE" };
+       status = new List<string> { "ONE", "TWO", "THREE" };
     }
 
     void removeError(int errorId )
@@ -93,5 +97,10 @@ else
     {
         Console.WriteLine($"Error Id {errorId} has been updated with new status {testStatus}");
         //  return true;
+    }
+
+    string getStatusDescriptionByValue(int value)
+    {
+        return ((StatusEnum)value).ToString();
     }
 }
