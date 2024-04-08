@@ -4,5 +4,5 @@ namespace DevelopmentProjectErrorBoardUI.Services;
 
 public interface IErrorService
 {
-    Task<IEnumerable<ErrorAndPathModel>> GetAsync(string endpoint);
+    Task<List<ErrorAndPathModel>> GetAllErrorsAsync();
 }

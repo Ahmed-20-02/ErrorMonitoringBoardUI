@@ -43,7 +43,8 @@ else
                     <td>@error.Error.DeveloperId</td>
                     <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
                     
-                    <td> <select value="@((StatusEnum)error.Error.StatusId)" class="select-element" @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
+                    <td> <select value="@((StatusEnum)error.Error.StatusId)" class="select-element" 
+                                 @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
                              @foreach (var st in statuses)
                              {
                                  <option value="@st">@st</option> 
@@ -68,39 +69,19 @@ else
     
     List<StatusEnum> statuses = Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().ToList();
    List<ErrorAndPathModel> errors;
-   //string apitest;
 
-   List<string> status;
     protected override async Task OnInitializedAsync()
     {
-        var httpRequestMessage = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri =new Uri($"{Http.BaseAddress.ToString()}GetErrors/GetAllErrors")
-        };
-
-        var resultContent = await Http.SendAsync(httpRequestMessage);
-       // apitest = resultContent.Content.ReadAsStringAsync().Result;
-
-       errors = JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(resultContent.Content.ReadAsStringAsync().Result);
-
-       status = new List<string> { "ONE", "TWO", "THREE" };
+       errors = await ErrorService.GetAllErrorsAsync();
     }
 
     void removeError(int errorId )
     {
         Console.WriteLine($"Error Id {errorId} has been removed");
-      //  return true;
     }
     
     void updateError(int errorId, string testStatus )
     {
         Console.WriteLine($"Error Id {errorId} has been updated with new status {testStatus}");
-        //  return true;
-    }
-
-    string getStatusDescriptionByValue(int value)
-    {
-        return ((StatusEnum)value).ToString();
     }
 }
