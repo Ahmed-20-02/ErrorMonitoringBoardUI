@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace DevelopmentProjectErrorBoardUI.Services
 {
     using DevelopmentProjectErrorBoardUI.Models;
@@ -18,13 +20,47 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 var httpRequestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"{_http.BaseAddress.ToString()}GetErrors/GetAllErrors")
+                    RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/GetAllErrors")
                 };
 
                 var result = await _http.SendAsync(httpRequestMessage);
 
                 var resultContent = await result.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(resultContent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        
+        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(int errorId, int statusId)
+        {
+            try
+            {
+                var updateRequestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/UpdateErrorStatus"),
+                    Content = new StringContent(JsonConvert.SerializeObject(new UpdateErrorStatusModel{ErrorId = errorId, StatusId = statusId}), Encoding.UTF8, "application/json")
+                };
+
+                var updateResult = await _http.SendAsync(updateRequestMessage);
+
+                var updateResultContent = await updateResult.Content.ReadAsStringAsync();
+                var updatedError = JsonConvert.DeserializeObject<ErrorModel>(updateResultContent);
+                
+                var getRequestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/GetAllErrors")
+                };
+
+                var getResult = await _http.SendAsync(getRequestMessage);
+
+                var getResultContent = await getResult.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(getResultContent);
             }
             catch (Exception e)
             {

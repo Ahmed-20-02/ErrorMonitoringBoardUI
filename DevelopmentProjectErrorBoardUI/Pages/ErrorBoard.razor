@@ -1,10 +1,7 @@
-﻿@page "/errorBoard"
+﻿@page "/errorboard"
 @using DevelopmentProjectErrorBoardUI.Services
 @using DevelopmentProjectErrorBoardUI.Models
-@using Newtonsoft.Json;
-@using System.Net
 @using DevelopmentProjectErrorBoardUI.Enums
-@inject HttpClient Http
 @inject IErrorService ErrorService
 
 <PageTitle>Error Monitor</PageTitle>
@@ -23,18 +20,26 @@ else
         @errors.Count
     </h1>
     
-    <table class="table">
-        <thead>
+    @if (errors.Count == 0)
+    {
+        <h2>
+            No errors to resolve at this time
+        </h2>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>File</th>
+                <th>Line</th>
+                <th>Agent Id</th>
+                <th>Dev Id</th>
                 <th>...</th>
             </tr>
-        </thead>
-        <tbody>
-        @foreach(var error in errors)
+            </thead>
+            <tbody>
+            @foreach(var error in errors)
             {
                 <tr>
                     <td>@error.Error.InitialFile</td>
@@ -45,11 +50,11 @@ else
                     
                     <td> <select value="@((StatusEnum)error.Error.StatusId)" class="select-element" 
                                  @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
-                             @foreach (var st in statuses)
-                             {
-                                 <option value="@st">@st</option> 
-                             }
-                    </select> 
+                            @foreach (var st in statuses)
+                            {
+                                <option value="@st">@st</option> 
+                            }
+                        </select> 
                     </td>
                 </tr>
                 @foreach (var path in error.LogPaths)
@@ -61,8 +66,11 @@ else
                     </tr>
                 }
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    }
+
+    
 }
 
 @code {
@@ -73,6 +81,7 @@ else
     protected override async Task OnInitializedAsync()
     {
        errors = await ErrorService.GetAllErrorsAsync();
+       Console.WriteLine(statuses);
     }
 
     void removeError(int errorId )
@@ -80,8 +89,9 @@ else
         Console.WriteLine($"Error Id {errorId} has been removed");
     }
     
-    void updateError(int errorId, string testStatus )
+    async Task updateError(int errorId, string testStatus )
     {
+        errors = await ErrorService.UpdateErrorStatusAsync(errorId, (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), testStatus));
         Console.WriteLine($"Error Id {errorId} has been updated with new status {testStatus}");
     }
 }

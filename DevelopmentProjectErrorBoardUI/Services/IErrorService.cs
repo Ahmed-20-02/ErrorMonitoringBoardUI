@@ -1,8 +1,10 @@
-using DevelopmentProjectErrorBoardUI.Models;
-
-namespace DevelopmentProjectErrorBoardUI.Services;
-
-public interface IErrorService
+namespace DevelopmentProjectErrorBoardUI.Services
 {
-    Task<List<ErrorAndPathModel>> GetAllErrorsAsync();
+    using DevelopmentProjectErrorBoardUI.Models;
+
+    public interface IErrorService
+    {
+        Task<List<ErrorAndPathModel>> GetAllErrorsAsync();
+        Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(int errorId, int statusId);
+    }
 }

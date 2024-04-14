@@ -17,5 +17,7 @@ namespace DevelopmentProjectErrorBoardUI.Models
         public int DeveloperId { get; set; }
         
         public int StatusId { get; set; }
+        
+        public string Message { get; set; }
     }
 }
