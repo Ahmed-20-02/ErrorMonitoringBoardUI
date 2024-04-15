@@ -5,6 +5,6 @@ namespace DevelopmentProjectErrorBoardUI.Services
     public interface IErrorService
     {
         Task<List<ErrorAndPathModel>> GetAllErrorsAsync();
-        Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(int errorId, int statusId);
+        Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model/*int errorId, int statusId, int agentId*/);
     }
 }

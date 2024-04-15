@@ -2,6 +2,7 @@
 @using DevelopmentProjectErrorBoardUI.Services
 @using DevelopmentProjectErrorBoardUI.Models
 @using DevelopmentProjectErrorBoardUI.Enums
+@using System.ComponentModel
 @inject IErrorService ErrorService
 
 <PageTitle>Error Monitor</PageTitle>
@@ -49,10 +50,17 @@ else
                     <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
                     
                     <td> <select value="@((StatusEnum)error.Error.StatusId)" class="select-element" 
-                                 @onchange="@(args => updateError(error.Error.ErrorId, args.Value.ToString()))">
+                                 @onchange="@(args => updateError(/*error.Error.ErrorId, args.Value.ToString(), error.Error.AgentId*/
+                                                new UpdateErrorStatusModel() 
+                                                {   ErrorId = error.Error.ErrorId, 
+                                                    StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()),
+                                                    AgentId =  error.Error.AgentId,
+                                                    CustomerId = error.Error.CustomerId,
+                                                    DevId = error.Error.DeveloperId
+                                                }))">
                             @foreach (var st in statuses)
                             {
-                                <option value="@st">@st</option> 
+                                <option value="@st">@GetEnumDescription(st)</option> 
                             }
                         </select> 
                     </td>
@@ -69,8 +77,6 @@ else
             </tbody>
         </table>
     }
-
-    
 }
 
 @code {
@@ -89,9 +95,16 @@ else
         Console.WriteLine($"Error Id {errorId} has been removed");
     }
     
-    async Task updateError(int errorId, string testStatus )
+    async Task updateError(UpdateErrorStatusModel model/*int errorId, string newStatus, int agentId*/ )
     {
-        errors = await ErrorService.UpdateErrorStatusAsync(errorId, (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), testStatus));
-        Console.WriteLine($"Error Id {errorId} has been updated with new status {testStatus}");
+        errors = await ErrorService.UpdateErrorStatusAsync( /*errorId, (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), newStatus), agentId*/ model);
+        // Console.WriteLine($"Error Id {errorId} has been updated with new status {newStatus}");
+    }
+    
+    static string GetEnumDescription(Enum value)
+    {
+        var field = value.GetType().GetField(value.ToString());
+        var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+        return attribute == null ? value.ToString() : attribute.Description;
     }
 }

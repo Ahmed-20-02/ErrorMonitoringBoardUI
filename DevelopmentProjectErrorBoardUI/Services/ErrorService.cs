@@ -35,7 +35,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(int errorId, int statusId)
+        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model/*int errorId, int statusId, int agentId*/)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 {
                     Method = HttpMethod.Put,
                     RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/UpdateErrorStatus"),
-                    Content = new StringContent(JsonConvert.SerializeObject(new UpdateErrorStatusModel{ErrorId = errorId, StatusId = statusId}), Encoding.UTF8, "application/json")
+                    Content = new StringContent(JsonConvert.SerializeObject(/*new UpdateErrorStatusModel{ErrorId = errorId, StatusId = statusId/*, AgentId = 3, CustomerId = 4, DevId = 2#1#}*/ model), Encoding.UTF8, "application/json")
                 };
 
                 var updateResult = await _http.SendAsync(updateRequestMessage);
