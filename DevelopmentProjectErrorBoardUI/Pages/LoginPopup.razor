@@ -1,0 +1,31 @@
+﻿@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager;
+@page "/LogIn"
+
+<PageTitle>LogIn</PageTitle>
+
+<div class="login-popup">
+    
+    <h3> Please log in to view, update and resolve errors</h3>
+    
+    <div class="login-content">
+        <h2>Login</h2>
+        <input id="emailStyle" type="text" @bind="Username" placeholder="Username"/>
+        <input type="password" @bind="Password" placeholder="Password"/>
+        <button @onclick="Login">Login</button>
+    </div>
+</div>
+
+@code {
+    private string? Username { get; set; }
+    private string? Password { get; set; }
+
+    private async Task Login()
+    {
+        // Perform login authentication here
+        // For simplicity, let's assume the login is successful
+        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "loggedIn", true);
+        // Reload the page to trigger OnInitializedAsync in ErrorBoard component
+        NavigationManager.NavigateTo("/", true);
+    }
+}

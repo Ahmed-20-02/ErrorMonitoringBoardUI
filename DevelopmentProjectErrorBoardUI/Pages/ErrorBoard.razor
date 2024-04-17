@@ -1,81 +1,79 @@
-﻿@page "/errorboard"
+﻿@page "/"//errorboard
 @using DevelopmentProjectErrorBoardUI.Services
 @using DevelopmentProjectErrorBoardUI.Models
 @using DevelopmentProjectErrorBoardUI.Enums
 @using System.ComponentModel
+@using System.Text.Json
 @inject IErrorService ErrorService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Error Monitor</PageTitle>
 
-<h1>Errors</h1>
-
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (errors == null)
+@if (!IsLoggedIn)
 {
-    <p><em>Loading...</em></p>
+    <LoginPopup />
 }
 else
 {
-    <h1>
-        @errors.Count
-    </h1>
-    
-    @if (errors.Count == 0)
+    @if (errors == null)
     {
-        <h2>
-            No errors to resolve at this time
-        </h2>
+        <p><em>Loading...</em></p>
     }
     else
     {
-        <table class="table">
-            <thead>
-            <tr>
-                <th>File</th>
-                <th>Line</th>
-                <th>Agent Id</th>
-                <th>Dev Id</th>
-                <th>...</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach(var error in errors)
-            {
+        <h2>Errors</h2>
+
+        @if (errors.Count == 0)
+        {
+            <h2>
+                No errors to resolve at this time
+            </h2>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
                 <tr>
-                    <td>@error.Error.InitialFile</td>
-                    <td>@error.Error.LineNumber</td>
-                    <td>@error.Error.AgentId</td>
-                    <td>@error.Error.DeveloperId</td>
-                    <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
-                    
-                    <td> <select value="@((StatusEnum)error.Error.StatusId)" class="select-element" 
-                                 @onchange="@(args => updateError(/*error.Error.ErrorId, args.Value.ToString(), error.Error.AgentId*/
-                                                new UpdateErrorStatusModel() 
-                                                {   ErrorId = error.Error.ErrorId, 
-                                                    StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()),
-                                                    AgentId =  error.Error.AgentId,
-                                                    CustomerId = error.Error.CustomerId,
-                                                    DevId = error.Error.DeveloperId
-                                                }))">
-                            @foreach (var st in statuses)
-                            {
-                                <option value="@st">@GetEnumDescription(st)</option> 
-                            }
-                        </select> 
-                    </td>
+                    <th>File</th>
+                    <th>Line</th>
+                    <th>Agent Id</th>
+                    <th>Dev Id</th>
+                    <th>Status</th>
+                    <th>Delete</th>
                 </tr>
-                @foreach (var path in error.LogPaths)
+                </thead>
+                <tbody>
+                @foreach (var error in errors)
                 {
                     <tr>
-                        <td></td> 
-                        <td>@path.FileName</td> 
-                        <td>@path.CreatedDate</td>
+                        <td>@error.Error.InitialFile</td>
+                        <td>@error.Error.LineNumber</td>
+                        <td>@error.Error.AgentId</td>
+                        <td>@error.Error.DeveloperId</td>
+                        <td>
+                            <select value="@((StatusEnum)error.Error.StatusId)" class="select-element"
+                                    @onchange="@(args => updateError( /*error.Error.ErrorId, args.Value.ToString(), error.Error.AgentId*/new UpdateErrorStatusModel() { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = error.Error.DeveloperId }))">
+                                @foreach (var st in statuses)
+                                {
+                                    <option value="@st">@GetEnumDescription(st)</option>
+                                }
+                            </select>
+                        </td>
+                        <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
+
                     </tr>
+                    @foreach (var path in error.LogPaths)
+                    {
+                        <tr>
+                            <td></td>
+                            <td>@path.FileName</td>
+                            <td>@path.CreatedDate</td>
+                        </tr>
+                    }
                 }
-            }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        }
     }
 }
 
@@ -83,10 +81,28 @@ else
     
     List<StatusEnum> statuses = Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().ToList();
    List<ErrorAndPathModel> errors;
+   bool IsLoggedIn { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-       errors = await ErrorService.GetAllErrorsAsync();
+        var isLoggedInJson = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "loggedIn");
+        if (!string.IsNullOrEmpty(isLoggedInJson))
+        {
+            // Parse the retrieved value as boolean
+            IsLoggedIn = JsonSerializer.Deserialize<bool>(isLoggedInJson);
+        }
+    
+        if (!IsLoggedIn)
+        {
+            // Ensure the blur effect is applied to the background
+            await JSRuntime.InvokeVoidAsync("document.body.classList.add", "blur");
+        }
+        else
+        {
+            errors = await ErrorService.GetAllErrorsAsync();
+            Console.WriteLine(statuses);
+        }
+      // errors = await ErrorService.GetAllErrorsAsync();
        Console.WriteLine(statuses);
     }
 
