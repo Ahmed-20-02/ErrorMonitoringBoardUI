@@ -34,6 +34,7 @@ else
             <table class="table">
                 <thead>
                 <tr>
+                    <th></th>
                     <th>File</th>
                     <th>Line</th>
                     <th>Agent Id</th>
@@ -46,13 +47,24 @@ else
                 @foreach (var error in errors)
                 {
                     <tr>
+                        <button @onclick="() => ToggleExpand(error.Error.ErrorId)" id="dropDownArrow">
+                            @if (expandedStates.TryGetValue(error.Error.ErrorId, out var expanded) && expanded)
+                            {
+                                <img src="up_arrow.png" alt="Button Image"/>
+                            }
+                            else
+                            {
+                                <img src="down_arrow.png" alt="Button Image"/>
+                            }
+                            
+                        </button>
                         <td>@error.Error.InitialFile</td>
                         <td>@error.Error.LineNumber</td>
                         <td>@error.Error.AgentId</td>
                         <td>@error.Error.DeveloperId</td>
                         <td>
                             <select value="@((StatusEnum)error.Error.StatusId)" class="select-element"
-                                    @onchange="@(args => updateError( /*error.Error.ErrorId, args.Value.ToString(), error.Error.AgentId*/new UpdateErrorStatusModel() { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = error.Error.DeveloperId }))">
+                                    @onchange="@(args => updateError(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId /*error.Error.DeveloperId */ }))">
                                 @foreach (var st in statuses)
                                 {
                                     <option value="@st">@GetEnumDescription(st)</option>
@@ -62,13 +74,39 @@ else
                         <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
 
                     </tr>
-                    @foreach (var path in error.LogPaths)
+                    
+                    @*@if (expandedStates.TryGetValue(error.Error.ErrorId, out var isExpanded) && isExpanded)
                     {
-                        <tr>
-                            <td></td>
-                            <td>@path.FileName</td>
-                            <td>@path.CreatedDate</td>
-                        </tr>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Created Date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var path in error.LogPaths)
+                            {
+                                <tr>
+                                    <td>@path.FileName</td>
+                                    <td>@path.CreatedDate</td>
+                                </tr>
+                            }
+                                </tbody>
+                        </table>
+                    }*@
+
+                   
+                    @if(expandedStates.TryGetValue(error.Error.ErrorId, out var isExpanded) && isExpanded)
+                    {
+                        @foreach (var path in error.LogPaths)
+                        {
+                            <tr>
+                                <td></td>
+                                <td>@path.FileName</td>
+                                <td>@path.CreatedDate</td>
+                            </tr>
+                        }
                     }
                 }
                 </tbody>
@@ -82,13 +120,15 @@ else
     List<StatusEnum> statuses = Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().ToList();
    List<ErrorAndPathModel> errors;
    bool IsLoggedIn { get; set; }
-
+   int devId { get; set; }
+   
+   private Dictionary<int, bool> expandedStates = new();
+   
     protected override async Task OnInitializedAsync()
     {
         var isLoggedInJson = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "loggedIn");
         if (!string.IsNullOrEmpty(isLoggedInJson))
         {
-            // Parse the retrieved value as boolean
             IsLoggedIn = JsonSerializer.Deserialize<bool>(isLoggedInJson);
         }
     
@@ -99,10 +139,17 @@ else
         }
         else
         {
+            devId = JsonSerializer.Deserialize<int>(await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "userId"));
+            
             errors = await ErrorService.GetAllErrorsAsync();
+
+            foreach (var er in errors)
+            {
+                ToggleExpand(er.Error.ErrorId);
+            }
+            
             Console.WriteLine(statuses);
         }
-      // errors = await ErrorService.GetAllErrorsAsync();
        Console.WriteLine(statuses);
     }
 
@@ -111,10 +158,9 @@ else
         Console.WriteLine($"Error Id {errorId} has been removed");
     }
     
-    async Task updateError(UpdateErrorStatusModel model/*int errorId, string newStatus, int agentId*/ )
+    async Task updateError(UpdateErrorStatusModel model)
     {
-        errors = await ErrorService.UpdateErrorStatusAsync( /*errorId, (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), newStatus), agentId*/ model);
-        // Console.WriteLine($"Error Id {errorId} has been updated with new status {newStatus}");
+        errors = await ErrorService.UpdateErrorStatusAsync(model);
     }
     
     static string GetEnumDescription(Enum value)
@@ -123,4 +169,19 @@ else
         var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
         return attribute == null ? value.ToString() : attribute.Description;
     }
+    
+    private void ToggleExpand(int errorId)
+    {
+        if (expandedStates.ContainsKey(errorId))
+        {
+            expandedStates[errorId] = !expandedStates[errorId];
+        }
+        else
+        {
+            expandedStates.Add(errorId, true);
+        }
+    }
 }
+
+@*reference 
+https://stackoverflow.com/questions/12169443/get-dictionary-value-by-key*@

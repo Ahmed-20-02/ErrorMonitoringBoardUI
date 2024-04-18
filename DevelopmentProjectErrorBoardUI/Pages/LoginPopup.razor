@@ -1,31 +1,84 @@
 ﻿@inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager;
 @page "/LogIn"
+@using DevelopmentProjectErrorBoardUI.Services
+@using DevelopmentProjectErrorBoardUI.Models
+@inject IErrorService ErrorService
 
 <PageTitle>LogIn</PageTitle>
 
 <div class="login-popup">
-    
+
     <h3> Please log in to view, update and resolve errors</h3>
-    
+
     <div class="login-content">
         <h2>Login</h2>
-        <input id="emailStyle" type="text" @bind="Username" placeholder="Username"/>
+        <input id="emailStyle" type="text" @bind="Email" placeholder="Email"/>
         <input type="password" @bind="Password" placeholder="Password"/>
-        <button @onclick="Login">Login</button>
+        <button @onclick="LogInAsync">Login</button>
+
+        <p class="error @(!string.IsNullOrEmpty(messageUI) ? "" : "hidden")">@messageUI</p>
+
     </div>
 </div>
 
 @code {
-    private string? Username { get; set; }
+    private string? Email { get; set; }
     private string? Password { get; set; }
 
-    private async Task Login()
+
+    string messageUI = "";
+
+    // This should be called from an async context, such as an async event handler or another async method
+    public async Task LogInAsync()
     {
-        // Perform login authentication here
-        // For simplicity, let's assume the login is successful
-        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "loggedIn", true);
-        // Reload the page to trigger OnInitializedAsync in ErrorBoard component
-        NavigationManager.NavigateTo("/", true);
+        try
+        {
+            if (string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(Password))
+            {
+                messageUI = "Please ensure both fields are filled";
+            }
+            else if (string.IsNullOrEmpty(Email))
+            {
+                messageUI = "Please fill email field";
+            }
+            else if (string.IsNullOrEmpty(Password))
+            {
+                messageUI = "Please fill password field";
+            }
+
+            else
+            {
+                var result = await ErrorService.LogInAsync(new LogInModel { EmailAddress = Email, Password = Password });
+                // Console.WriteLine($"Results userId is {result.User.UserId}, result IsAuthenticated value is {result.IsAuthenticated}, message {result.Message} ");
+
+                if (result == null)
+                {
+                    Console.WriteLine("Failed to log in; the result is null.");
+                    messageUI = "RESULT IS NULL";
+                    return;
+                }
+
+                if (result.IsAuthenticated)
+                {
+                    await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "userFirstName", result.User.FirstName);
+                    await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "userId", result.User.UserId);
+                    await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "loggedIn", true);
+
+                    // Reload the page to trigger OnInitializedAsync in ErrorBoard page
+                    NavigationManager.NavigateTo("/", true);
+                }
+
+                else
+                {
+                    messageUI = result.Message;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
+
 }

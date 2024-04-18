@@ -35,7 +35,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model/*int errorId, int statusId, int agentId*/)
+        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 {
                     Method = HttpMethod.Put,
                     RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/UpdateErrorStatus"),
-                    Content = new StringContent(JsonConvert.SerializeObject(/*new UpdateErrorStatusModel{ErrorId = errorId, StatusId = statusId/*, AgentId = 3, CustomerId = 4, DevId = 2#1#}*/ model), Encoding.UTF8, "application/json")
+                    Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
                 };
 
                 var updateResult = await _http.SendAsync(updateRequestMessage);
@@ -61,6 +61,29 @@ namespace DevelopmentProjectErrorBoardUI.Services
 
                 var getResultContent = await getResult.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<List<ErrorAndPathModel>>(getResultContent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        
+        public async Task<DevCheckLogInModel> LogInAsync(LogInModel model)
+        {
+            try
+            {
+                var logInRequestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/DevLogIn"),
+                    Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
+                };
+
+                var logInResult = await _http.SendAsync(logInRequestMessage);
+
+                var updateResultContent = await logInResult.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<DevCheckLogInModel>(updateResultContent);
             }
             catch (Exception e)
             {

@@ -107,7 +107,7 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Hide scrollbars if the content fits in the viewport */
+    overflow: auto; /* Hide scrollbars if the content fits in the viewport */
 }
 
 /* Remove any default margins or paddings from all elements */
@@ -130,8 +130,8 @@ html, body {
 }
 
 .login-content {
-    width: 300px; /* You can adjust the width as necessary */
-    padding: 20px;
+    width: 25%; /* You can adjust the width as necessary */
+    padding: 20px 20px 10px 20px;
     border-radius: 5px;
     background: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -144,7 +144,30 @@ html, body {
     input{
         margin-bottom: 15px;
         width: 75%;
-
+    }
+    
+    button{
+        margin-bottom: 15px;
     }
    /* align-items: stretch;*/ /* Align children width to stretch to fit the .login-content width */
+}
+.error {
+    color: red;
+    min-height: 35px; 
+    text-align: center;
+    width: 75%; 
+    transition: visibility 0.2s, opacity 0.2s linear; 
+}
+
+.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+#dropDownArrow {
+    border: none;
+    outline: none; /* Be aware of the accessibility implications */
+    background: none;
+    padding: 0;
+    margin: 0;
 }

@@ -6,6 +6,6 @@ namespace DevelopmentProjectErrorBoardUI.Models
         public int StatusId { get; set; }
         public int AgentId { get; set; }
         public int? CustomerId { get; set; }
-        public int? DevId { get; set; }
+        public int DevId { get; set; }
     }
 }
