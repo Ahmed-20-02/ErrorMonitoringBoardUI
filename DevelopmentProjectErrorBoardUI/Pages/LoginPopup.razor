@@ -3,6 +3,7 @@
 @page "/LogIn"
 @using DevelopmentProjectErrorBoardUI.Services
 @using DevelopmentProjectErrorBoardUI.Models
+@using DevelopmentProjectErrorBoardUI.Services.Interfaces
 @inject IErrorService ErrorService
 
 <PageTitle>LogIn</PageTitle>
@@ -33,6 +34,8 @@
     {
         try
         {
+            messageUI = "";
+            
             if (string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(Password))
             {
                 messageUI = "Please ensure both fields are filled";
@@ -49,14 +52,6 @@
             else
             {
                 var result = await ErrorService.LogInAsync(new LogInModel { EmailAddress = Email, Password = Password });
-                // Console.WriteLine($"Results userId is {result.User.UserId}, result IsAuthenticated value is {result.IsAuthenticated}, message {result.Message} ");
-
-                if (result == null)
-                {
-                    Console.WriteLine("Failed to log in; the result is null.");
-                    messageUI = "RESULT IS NULL";
-                    return;
-                }
 
                 if (result.IsAuthenticated)
                 {
@@ -79,5 +74,4 @@
             Console.WriteLine($"An error occurred: {ex.Message}");
         }
     }
-
 }

@@ -2,6 +2,7 @@ using DevelopmentProjectErrorBoardUI;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using DevelopmentProjectErrorBoardUI.Services;
+using DevelopmentProjectErrorBoardUI.Services.Interfaces;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

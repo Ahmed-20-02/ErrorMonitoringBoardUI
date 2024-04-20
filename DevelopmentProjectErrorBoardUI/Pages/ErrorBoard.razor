@@ -4,6 +4,7 @@
 @using DevelopmentProjectErrorBoardUI.Enums
 @using System.ComponentModel
 @using System.Text.Json
+@using DevelopmentProjectErrorBoardUI.Services.Interfaces
 @inject IErrorService ErrorService
 @inject IJSRuntime JSRuntime
 
@@ -38,7 +39,7 @@ else
                     <th>File</th>
                     <th>Line</th>
                     <th>Agent Id</th>
-                    <th>Dev Id</th>
+                    <th>Developer</th>
                     <th>Status</th>
                     <th>Delete</th>
                 </tr>
@@ -61,7 +62,25 @@ else
                         <td>@error.Error.InitialFile</td>
                         <td>@error.Error.LineNumber</td>
                         <td>@error.Error.AgentId</td>
-                        <td>@error.Error.DeveloperId</td>
+                        @*@if (error.Error.DeveloperId == null)
+                         {
+                             <td>Unassigned</td>
+                         }
+                        else
+                        {
+                           <td>@error.Error.DeveloperId</td> 
+                        }*@
+                        <td> 
+                            <select 
+                                value="@(error.Error.DeveloperId ?? 1)" 
+                                class="select-element"
+                                    @onchange="@(args => updateDeveloper(error.Error.ErrorId, args.Value.ToString()))">
+                                @foreach (var dev in developers)
+                                {
+                                    <option value="@dev.UserId">@dev.FirstName @(dev.UserId == 1 ? "" : "."+dev.LastName[0])</option>
+                                }
+                            </select>
+                        </td>
                         <td>
                             <select value="@((StatusEnum)error.Error.StatusId)" class="select-element"
                                     @onchange="@(args => updateError(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId /*error.Error.DeveloperId */ }))">
@@ -74,28 +93,6 @@ else
                         <td> <button @onclick="() => removeError(error.Error.ErrorId)">Remove</button> </td>
 
                     </tr>
-                    
-                    @*@if (expandedStates.TryGetValue(error.Error.ErrorId, out var isExpanded) && isExpanded)
-                    {
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>File Name</th>
-                                <th>Created Date</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var path in error.LogPaths)
-                            {
-                                <tr>
-                                    <td>@path.FileName</td>
-                                    <td>@path.CreatedDate</td>
-                                </tr>
-                            }
-                                </tbody>
-                        </table>
-                    }*@
-
                    
                     @if(expandedStates.TryGetValue(error.Error.ErrorId, out var isExpanded) && isExpanded)
                     {
@@ -119,6 +116,7 @@ else
     
     List<StatusEnum> statuses = Enum.GetValues(typeof(StatusEnum)).Cast<StatusEnum>().ToList();
    List<ErrorAndPathModel> errors;
+   List<UserModel> developers;
    bool IsLoggedIn { get; set; }
    int devId { get; set; }
    
@@ -132,17 +130,19 @@ else
             IsLoggedIn = JsonSerializer.Deserialize<bool>(isLoggedInJson);
         }
     
-        if (!IsLoggedIn)
-        {
-            // Ensure the blur effect is applied to the background
-           // await JSRuntime.InvokeVoidAsync("document.body.classList.add", "blur");
-        }
-        else
+        if (IsLoggedIn)
         {
             devId = JsonSerializer.Deserialize<int>(await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "userId"));
             
             errors = await ErrorService.GetAllErrorsAsync();
 
+            developers = await ErrorService.GetDevelopersAsync();
+
+            foreach (var u in developers)
+            {
+                Console.WriteLine(u.EmailAddress);
+            }
+            
             foreach (var er in errors)
             {
                 ToggleExpand(er.Error.ErrorId);
@@ -150,6 +150,7 @@ else
             
             Console.WriteLine(statuses);
         }
+        
        Console.WriteLine(statuses);
     }
 
@@ -161,6 +162,12 @@ else
     async Task updateError(UpdateErrorStatusModel model)
     {
         errors = await ErrorService.UpdateErrorStatusAsync(model);
+    }
+    
+    async Task updateDeveloper( int errorId, string devId)
+    {
+        errors = await ErrorService.UpdateErrorsAssignedDeveloperAsync(new UpdateErrorsAssignedDeveloperModel{ErrorId =errorId, DevId = Convert.ToInt32(devId)});
+        Console.WriteLine($"update dev called with errorId {errorId} and devId {devId}");
     }
     
     static string GetEnumDescription(Enum value)
