@@ -1,16 +1,48 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using System.Text.Json
+
+
 <div class="page">
     @*<div class="sidebar">
         <NavMenu />
     </div>*@
-
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (IsLoggedIn)
+            {
+                <button @onclick="LogOut">
+                    Log Out
+                </button>
+            }
         </div>
-        
+
         <div class="content px-4">
             @Body
         </div>
     </main>
 </div>
+
+@code
+{
+    bool IsLoggedIn { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isLoggedInJson = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "loggedIn");
+        if (!string.IsNullOrEmpty(isLoggedInJson))
+        {
+            IsLoggedIn = JsonSerializer.Deserialize<bool>(isLoggedInJson);
+        }
+    }
+
+    private async Task LogOut()
+    {
+        await JSRuntime.InvokeVoidAsync("sessionStorage.clear");
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); // Reload the page
+
+       // await JSRuntime.InvokeVoidAsync("clearSessionStorage");
+       // await JSRuntime.InvokeVoidAsync("refreshPage");
+    }
+}
