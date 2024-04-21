@@ -4,11 +4,14 @@ namespace DevelopmentProjectErrorBoardUI.Services.Interfaces
 
     public interface IErrorService
     {
-        Task<List<ErrorAndPathModel>> GetAllErrorsAsync();
+        Task<List<ErrorAndPathModel>> GetErrorsAsync();
         Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model);
+        Task<List<ErrorAndPathModel>> DeactivateError(DeactivateErrorModel model);
         Task<List<ErrorAndPathModel>> UpdateErrorsAssignedDeveloperAsync(UpdateErrorsAssignedDeveloperModel model);
-
         Task<DevCheckLogInModel> LogInAsync(LogInModel model);
         Task<List<UserModel>> GetDevelopersAsync();
+
+        Task<List<ProjectModel>> GetProjectsAsync();
+
     }
 }
