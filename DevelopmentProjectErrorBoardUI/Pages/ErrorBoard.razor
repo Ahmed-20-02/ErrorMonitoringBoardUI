@@ -55,17 +55,24 @@ else
                     @foreach (var error in errors.Where(x => x.Error.ProjectId == project.ProjectId))
                     {
                         <tr>
-                            <button @onclick="() => ToggleExpand(error.Error.ErrorId)" id="dropDownArrow">
-                                @if (expandedStates.TryGetValue(error.Error.ErrorId, out var expanded) && expanded)
-                                {
-                                    <img src="up_arrow.png" alt="Button Image"/>
-                                }
-                                else
-                                {
-                                    <img src="down_arrow.png" alt="Button Image"/>
-                                }
-
-                            </button>
+                            
+                            @if (error.LogPaths.Any())
+                            {
+                                <button @onclick="() => ToggleExpand(error.Error.ErrorId)" id="dropDownArrow">
+                                    @if (expandedStates.TryGetValue(error.Error.ErrorId, out var expanded) && expanded)
+                                    {
+                                        <img src="up_arrow.png" alt="Button Image"/>
+                                    }
+                                    else
+                                    {
+                                        <img src="down_arrow.png" alt="Button Image"/>
+                                    }
+                                </button>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
                             <td>@error.Error.InitialFile</td>
                             <td>@error.Error.LineNumber</td>
                             <td>@error.Error.AgentId</td>
@@ -82,11 +89,7 @@ else
                             </td>
                             <td>
                                 <select value="@((StatusEnum)error.Error.StatusId)" class="select-element"
-                                        @onchange="@(args => updateError(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, 
-                                                                                                    StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), 
-                                                                                                    AgentId = error.Error.AgentId, 
-                                                                                                    CustomerId = error.Error.CustomerId, 
-                                                                                                    DevId = devId}))"
+                                        @onchange="@(args => updateError(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId }))"
                                         disabled="@(error.Error.DeveloperId == null || error.Error.DeveloperId == 1 ? "disabled" : null)">
                                     @foreach (var st in statuses)
                                     {
