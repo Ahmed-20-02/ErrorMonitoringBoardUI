@@ -1,6 +1,8 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    background-color: #f4f4f4;
+    padding: 20px;}
 
 h1:focus {
     outline: none;
@@ -107,14 +109,13 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow: auto; /* Hide scrollbars if the content fits in the viewport */
+    overflow: auto; 
 }
 
-/* Remove any default margins or paddings from all elements */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Border and padding should not increase the size of elements */
+    box-sizing: border-box;
 }
 
 .login-popup {
@@ -122,7 +123,7 @@ html, body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: fixed; /* Fixed positioning to make sure it's always centered */
+    position: fixed; 
     top: 0;
     left: 0;
     right: 0;
@@ -130,7 +131,7 @@ html, body {
 }
 
 .login-content {
-    width: 25%; /* You can adjust the width as necessary */
+    width: 25%; 
     padding: 20px 20px 10px 20px;
     border-radius: 5px;
     background: white;
@@ -149,7 +150,6 @@ html, body {
     button{
         margin-bottom: 15px;
     }
-   /* align-items: stretch;*/ /* Align children width to stretch to fit the .login-content width */
 }
 .error {
     color: red;
@@ -166,8 +166,75 @@ html, body {
 
 #dropDownArrow {
     border: none;
-    outline: none; /* Be aware of the accessibility implications */
+    outline: none;
     background: none;
-    padding: 0;
+    padding: 0 0 0 5%;
+    margin: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+thead {
+    background-color: #00a4c4;
+    color: #ffffff;
+}
+
+.mainFile {
+    background-color: rgba(225, 225, 225, 0.27);
+}
+
+button:not(#dropDownArrow) {
+    background-color: #00a4c4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:not(#dropDownArrow):hover {
+    background-color: #097d91;
+}
+.select-element {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+.error {
+    color: #ff6b6b;
+    background-color: #ffebeb;
+    padding: 10px;
+    border-left: 5px solid #ff6b6b;
+    margin-bottom: 20px;
+}
+
+#projectText {
+    font-weight: 550; /* Semi-bold */
+}
+
+#errors-heading {
+    text-align: center;
+    /* Other styles such as margin, padding, etc., to adjust the spacing and layout */
+}
+
+.emptyTd{
+    border: none;
+    outline: none;
+    background: none;
+    padding: 0 0 0 0;
     margin: 0;
 }

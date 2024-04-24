@@ -23,7 +23,7 @@ else
     }
     else
     {
-        <h2>Errors</h2>
+        <h2 id="errors-heading">Errors</h2>
 
         @if (errors.Count == 0)
         {
@@ -36,13 +36,14 @@ else
             <table class="table">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th>Project</th>
                     <th>File</th>
                     <th>Line</th>
                     <th>Agent Id</th>
+                    <th>Message</th>
                     <th>Developer</th>
                     <th>Status</th>
-                    <th>Deactivate</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -50,11 +51,16 @@ else
                 @foreach (var project in projects)
                 {
                     <tr>
-                        <h5> @project.ProjectName</h5>
+                        <h5 id="projectText">
+                            @if (errors.Any(x => x.Error.ProjectId == project.ProjectId))
+                            {
+                                @project.ProjectName
+                            }
+                        </h5>
                     </tr>
                     @foreach (var error in errors.Where(x => x.Error.ProjectId == project.ProjectId))
                     {
-                        <tr>
+                        <tr class="mainFile">
                             
                             @if (error.LogPaths.Any())
                             {
@@ -73,9 +79,10 @@ else
                             {
                                 <td></td>
                             }
-                            <td>@error.Error.InitialFile</td>
-                            <td>@error.Error.LineNumber</td>
-                            <td>@error.Error.AgentId</td>
+                            <td> @error.Error.InitialFile </td>
+                            <td> @error.Error.LineNumber </td>
+                            <td> @error.Error.AgentId </td>
+                            <td> @error.Error.Message </td>
                             <td>
                                 <select
                                     value="@(error.Error.DeveloperId ?? 1)"
@@ -98,7 +105,7 @@ else
                                 </select>
                             </td>
                             <td>
-                                <button @onclick="() => deactivateError(new DeactivateErrorModel { ErrorId = error.Error.ErrorId })">Deactivate</button>
+                                <button id="closeBtn" @onclick="() => deactivateError(new DeactivateErrorModel { ErrorId = error.Error.ErrorId })">Close</button>
                             </td>
 
                         </tr>
@@ -108,7 +115,8 @@ else
                             @foreach (var path in error.LogPaths)
                             {
                                 <tr>
-                                    <td></td>
+                                    <td class="emptyTd"></td>
+                                    <td class="emptyTd"></td>
                                     <td>@path.FileName</td>
                                     <td>@path.CreatedDate</td>
                                 </tr>
