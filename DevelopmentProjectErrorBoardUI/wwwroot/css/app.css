@@ -188,6 +188,9 @@ th, td {
 thead {
     background-color: #00a4c4;
     color: #ffffff;
+    position: sticky;
+    top: 60px;
+    z-index: 10;
 }
 
 .mainFile {
@@ -223,12 +226,12 @@ button:not(#dropDownArrow):hover {
 }
 
 #projectText {
-    font-weight: 550; /* Semi-bold */
+    font-weight: 550;
 }
 
 #errors-heading {
     text-align: center;
-    /* Other styles such as margin, padding, etc., to adjust the spacing and layout */
+    font-weight: 550
 }
 
 .emptyTd{
