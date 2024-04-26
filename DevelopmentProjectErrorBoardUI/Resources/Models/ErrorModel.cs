@@ -1,4 +1,4 @@
-namespace DevelopmentProjectErrorBoardUI.Models
+namespace DevelopmentProjectErrorBoardUI.Resources.Models
 {
     public class ErrorModel
     {

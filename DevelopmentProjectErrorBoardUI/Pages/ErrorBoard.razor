@@ -1,5 +1,7 @@
 ﻿@page "/"
-@using DevelopmentProjectErrorBoardUI.Models
+
+@using DevelopmentProjectErrorBoardUI.Resources.Models
+@using DevelopmentProjectErrorBoardUI.Resources.Requests
 @using DevelopmentProjectErrorBoardUI.Enums
 @using System.ComponentModel
 @using System.Text.Json
@@ -97,7 +99,7 @@ else
                             </td>
                             <td>
                                 <select value="@((StatusEnum)error.Error.StatusId)" class="select-element"
-                                        @onchange="@(args => updateErrorStatus(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId }))"
+                                        @onchange="@(args => updateErrorStatus(new UpdateErrorStatusRequest { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId }))"
                                         disabled="@(error.Error.DeveloperId == null || error.Error.DeveloperId == 1 ? "disabled" : null)">
                                     @foreach (var st in statuses)
                                     {
@@ -106,7 +108,7 @@ else
                                 </select>
                             </td>
                             <td>
-                                <button id="closeBtn" @onclick="() => deactivateError(new DeactivateErrorModel { ErrorId = error.Error.ErrorId })">Close</button>
+                                <button id="closeBtn" @onclick="() => deactivateError(new DeactivateErrorRequest { ErrorId = error.Error.ErrorId })">Close</button>
                             </td>
 
                         </tr>
@@ -167,21 +169,21 @@ else
         }
     }
 
-    async Task updateErrorStatus(UpdateErrorStatusModel model)
+    async Task updateErrorStatus(UpdateErrorStatusRequest request)
     {
-        errors = await ErrorService.UpdateErrorStatusAsync(model);
-        ToastService.ShowInfo($"Error {model.ErrorId} Updated");
+        errors = await ErrorService.UpdateErrorStatusAsync(request);
+        ToastService.ShowInfo($"Error {request.ErrorId} Updated");
     }
 
-    async Task deactivateError(DeactivateErrorModel model)
+    async Task deactivateError(DeactivateErrorRequest request)
     {
-        errors = await ErrorService.DeactivateError(model);
-        ToastService.ShowInfo($"Error {model.ErrorId} Closed");
+        errors = await ErrorService.DeactivateError(request);
+        ToastService.ShowInfo($"Error {request.ErrorId} Closed");
     }
 
     async Task updateDeveloper(int errorId, string devId)
     {
-        errors = await ErrorService.UpdateErrorsAssignedDeveloperAsync(new UpdateErrorsAssignedDeveloperModel { ErrorId = errorId, DevId = Convert.ToInt32(devId) });
+        errors = await ErrorService.UpdateErrorsAssignedDeveloperAsync(new UpdateErrorsAssignedDeveloperRequest { ErrorId = errorId, DevId = Convert.ToInt32(devId) });
         ToastService.ShowInfo($"Developer {devId} Assigned");
     }
 

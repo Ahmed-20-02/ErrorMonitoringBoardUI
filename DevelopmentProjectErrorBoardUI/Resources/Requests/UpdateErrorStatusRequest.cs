@@ -1,6 +1,6 @@
-namespace DevelopmentProjectErrorBoardUI.Models
+namespace DevelopmentProjectErrorBoardUI.Resources.Requests
 {
-    public class UpdateErrorStatusModel
+    public class UpdateErrorStatusRequest
     {
         public int ErrorId { get; set; }
         public int StatusId { get; set; }

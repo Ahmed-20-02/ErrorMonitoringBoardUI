@@ -2,8 +2,10 @@ namespace DevelopmentProjectErrorBoardUI.Services
 {
     using System.Text;
     using DevelopmentProjectErrorBoardUI.Services.Interfaces;
-    using DevelopmentProjectErrorBoardUI.Models;
     using Newtonsoft.Json;
+    using DevelopmentProjectErrorBoardUI.Resources.Models;
+    using DevelopmentProjectErrorBoardUI.Resources.Requests;
+    
     public class ErrorService : IErrorService
     {
         private readonly HttpClient _http;
@@ -79,7 +81,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model)
+        public async Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusRequest request)
         {
             try
             {
@@ -87,7 +89,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 {
                     Method = HttpMethod.Put,
                     RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/UpdateErrorStatus"),
-                    Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
+                    Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
                 };
 
                 var updateResult = await _http.SendAsync(updateRequestMessage);
@@ -112,7 +114,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<List<ErrorAndPathModel>> DeactivateError(DeactivateErrorModel model)
+        public async Task<List<ErrorAndPathModel>> DeactivateError(DeactivateErrorRequest request)
         {
             try
             {
@@ -120,7 +122,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 {
                     Method = HttpMethod.Put,
                     RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/DeactivateError"),
-                    Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
+                    Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
                 };
 
                 await _http.SendAsync(deactivateRequestMessage);
@@ -143,7 +145,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<List<ErrorAndPathModel>> UpdateErrorsAssignedDeveloperAsync(UpdateErrorsAssignedDeveloperModel model)
+        public async Task<List<ErrorAndPathModel>> UpdateErrorsAssignedDeveloperAsync(UpdateErrorsAssignedDeveloperRequest request)
         {
             try
             {
@@ -151,7 +153,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 {
                     Method = HttpMethod.Put,
                     RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/UpdateErrorsAssignedDeveloper"),
-                    Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
+                    Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
                 };
 
                 var updateResult = await _http.SendAsync(updateRequestMessage);
@@ -176,7 +178,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<DevCheckLogInModel> LogInAsync(LogInModel model)
+        public async Task<DevCheckLogInRequest> LogInAsync(LogInModelRequest modelRequest)
         {
             try
             {
@@ -184,13 +186,13 @@ namespace DevelopmentProjectErrorBoardUI.Services
                 {
                     Method = HttpMethod.Post,
                     RequestUri = new Uri($"{_http.BaseAddress.ToString()}Errors/DevLogIn"),
-                    Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json")
+                    Content = new StringContent(JsonConvert.SerializeObject(modelRequest), Encoding.UTF8, "application/json")
                 };
 
                 var logInResult = await _http.SendAsync(logInRequestMessage);
 
                 var updateResultContent = await logInResult.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<DevCheckLogInModel>(updateResultContent);
+                return JsonConvert.DeserializeObject<DevCheckLogInRequest>(updateResultContent);
             }
             catch (Exception e)
             {

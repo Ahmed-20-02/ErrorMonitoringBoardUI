@@ -1,10 +1,13 @@
-﻿@inject IJSRuntime JSRuntime;
+﻿@page "/LogIn"
+
+@inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager;
-@page "/LogIn"
 @using DevelopmentProjectErrorBoardUI.Services
-@using DevelopmentProjectErrorBoardUI.Models
+@using DevelopmentProjectErrorBoardUI.Resources.Models
+@using DevelopmentProjectErrorBoardUI.Resources.Requests
 @using DevelopmentProjectErrorBoardUI.Services.Interfaces
 @inject IErrorService ErrorService
+@inject IToastService ToastService
 
 <PageTitle>LogIn</PageTitle>
 
@@ -51,7 +54,9 @@
 
             else
             {
-                var result = await ErrorService.LogInAsync(new LogInModel { EmailAddress = Email, Password = Password });
+                ToastService.ShowInfo("Attempting To Log You In...");
+
+                var result = await ErrorService.LogInAsync(new LogInModelRequest { EmailAddress = Email, Password = Password });
 
                 if (result.IsAuthenticated)
                 {

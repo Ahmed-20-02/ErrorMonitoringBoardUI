@@ -1,14 +1,15 @@
 namespace DevelopmentProjectErrorBoardUI.Services.Interfaces
 {
-    using DevelopmentProjectErrorBoardUI.Models;
-
+    using DevelopmentProjectErrorBoardUI.Resources.Models;
+    using DevelopmentProjectErrorBoardUI.Resources.Requests;
+    
     public interface IErrorService
     {
         Task<List<ErrorAndPathModel>> GetErrorsAsync();
-        Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusModel model);
-        Task<List<ErrorAndPathModel>> DeactivateError(DeactivateErrorModel model);
-        Task<List<ErrorAndPathModel>> UpdateErrorsAssignedDeveloperAsync(UpdateErrorsAssignedDeveloperModel model);
-        Task<DevCheckLogInModel> LogInAsync(LogInModel model);
+        Task<List<ErrorAndPathModel>> UpdateErrorStatusAsync(UpdateErrorStatusRequest request);
+        Task<List<ErrorAndPathModel>> DeactivateError(DeactivateErrorRequest request);
+        Task<List<ErrorAndPathModel>> UpdateErrorsAssignedDeveloperAsync(UpdateErrorsAssignedDeveloperRequest request);
+        Task<DevCheckLogInRequest> LogInAsync(LogInModelRequest modelRequest);
         Task<List<UserModel>> GetDevelopersAsync();
 
         Task<List<ProjectModel>> GetProjectsAsync();
