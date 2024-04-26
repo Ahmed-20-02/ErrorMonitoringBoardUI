@@ -2,7 +2,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @using System.Text.Json
-
+@using Blazored.Toast.Configuration
 
 <div class="page">
     <main>
@@ -21,6 +21,14 @@
     </main>
 </div>
 
+<BlazoredToasts Position="ToastPosition.TopLeft"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug"
+                ShowCloseButton="false"/>
+
 @code
 {
     bool IsLoggedIn { get; set; }
@@ -38,8 +46,8 @@
     {
         await JSRuntime.InvokeVoidAsync("sessionStorage.clear");
         NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true); // Reload the page
-
-       // await JSRuntime.InvokeVoidAsync("clearSessionStorage");
-       // await JSRuntime.InvokeVoidAsync("refreshPage");
     }
 }
+
+@*reference 
+https://www.youtube.com/watch?v=F49YGCtKCGs&ab_channel=AshProgHelp-ProgrammingHelp*@

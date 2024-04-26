@@ -6,6 +6,7 @@
 @using DevelopmentProjectErrorBoardUI.Services.Interfaces
 @inject IErrorService ErrorService
 @inject IJSRuntime JSRuntime
+@inject IToastService ToastService
 
 <PageTitle>Error Monitor</PageTitle>
 
@@ -96,7 +97,7 @@ else
                             </td>
                             <td>
                                 <select value="@((StatusEnum)error.Error.StatusId)" class="select-element"
-                                        @onchange="@(args => updateError(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId }))"
+                                        @onchange="@(args => updateErrorStatus(new UpdateErrorStatusModel { ErrorId = error.Error.ErrorId, StatusId = (int)(StatusEnum)Enum.Parse(typeof(StatusEnum), args.Value.ToString()), AgentId = error.Error.AgentId, CustomerId = error.Error.CustomerId, DevId = devId }))"
                                         disabled="@(error.Error.DeveloperId == null || error.Error.DeveloperId == 1 ? "disabled" : null)">
                                     @foreach (var st in statuses)
                                     {
@@ -159,35 +160,29 @@ else
 
             projects = await ErrorService.GetProjectsAsync();
 
-            foreach (var u in developers)
-            {
-                Console.WriteLine(u.EmailAddress);
-            }
-
             foreach (var er in errors)
             {
                 ToggleExpand(er.Error.ErrorId);
             }
-
-            Console.WriteLine(statuses);
         }
-
-        Console.WriteLine(statuses);
     }
 
-    async Task updateError(UpdateErrorStatusModel model)
+    async Task updateErrorStatus(UpdateErrorStatusModel model)
     {
         errors = await ErrorService.UpdateErrorStatusAsync(model);
+        ToastService.ShowInfo($"Error {model.ErrorId} Updated");
     }
 
     async Task deactivateError(DeactivateErrorModel model)
     {
         errors = await ErrorService.DeactivateError(model);
+        ToastService.ShowInfo($"Error {model.ErrorId} Closed");
     }
 
     async Task updateDeveloper(int errorId, string devId)
     {
         errors = await ErrorService.UpdateErrorsAssignedDeveloperAsync(new UpdateErrorsAssignedDeveloperModel { ErrorId = errorId, DevId = Convert.ToInt32(devId) });
+        ToastService.ShowInfo($"Developer {devId} Assigned");
     }
 
     static string GetEnumDescription(Enum value)

@@ -219,9 +219,7 @@ button:not(#dropDownArrow):hover {
 
 .error {
     color: #ff6b6b;
-    background-color: #ffebeb;
     padding: 10px;
-    border-left: 5px solid #ff6b6b;
     margin-bottom: 20px;
 }
 
@@ -240,4 +238,8 @@ button:not(#dropDownArrow):hover {
     background: none;
     padding: 0 0 0 0;
     margin: 0;
+}
+
+div.blazored-toast.blazored-toast-info {
+    border-top: 6px solid #00a4c4;
 }
