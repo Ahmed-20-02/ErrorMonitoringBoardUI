@@ -143,7 +143,7 @@ else
     int devId { get; set; }
 
     private Dictionary<int, bool> expandedStates = new();
-
+    
     protected override async Task OnInitializedAsync()
     {
         var isLoggedInJson = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "loggedIn");
@@ -184,7 +184,8 @@ else
     async Task updateDeveloper(int errorId, string devId)
     {
         errors = await ErrorService.UpdateErrorsAssignedDeveloperAsync(new UpdateErrorsAssignedDeveloperRequest { ErrorId = errorId, DevId = Convert.ToInt32(devId) });
-        ToastService.ShowInfo($"Developer {devId} Assigned");
+        
+        ToastService.ShowInfo( Convert.ToInt32(devId) == (int)RolesEnum.System ? "Error Unassigned" : $"Developer {devId} Assigned");
     }
 
     static string GetEnumDescription(Enum value)
