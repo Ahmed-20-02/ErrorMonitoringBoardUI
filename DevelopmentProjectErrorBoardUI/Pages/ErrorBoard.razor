@@ -108,7 +108,7 @@ else
                                 </select>
                             </td>
                             <td>
-                                <button id="closeBtn" @onclick="() => deactivateError(new DeactivateErrorRequest { ErrorId = error.Error.ErrorId })">Close</button>
+                                <button id="closeBtn" @onclick="() => closeError(new DeactivateErrorRequest { ErrorId = error.Error.ErrorId })">Close</button>
                             </td>
 
                         </tr>
@@ -175,9 +175,9 @@ else
         ToastService.ShowInfo($"Error {request.ErrorId} Updated");
     }
 
-    async Task deactivateError(DeactivateErrorRequest request)
+    async Task closeError(DeactivateErrorRequest request)
     {
-        errors = await ErrorService.DeactivateError(request);
+        errors = await ErrorService.CloseError(request);
         ToastService.ShowInfo($"Error {request.ErrorId} Closed");
     }
 

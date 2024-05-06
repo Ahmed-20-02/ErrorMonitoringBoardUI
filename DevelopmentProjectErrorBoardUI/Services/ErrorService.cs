@@ -114,7 +114,7 @@ namespace DevelopmentProjectErrorBoardUI.Services
             }
         }
         
-        public async Task<List<ErrorAndPathModel>> DeactivateError(DeactivateErrorRequest request)
+        public async Task<List<ErrorAndPathModel>> CloseError(DeactivateErrorRequest request)
         {
             try
             {
